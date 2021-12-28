@@ -1,0 +1,33 @@
+Source: wipefreespace
+Section: utils
+Priority: optional
+Maintainer: Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>
+Build-Depends: debhelper-compat (= 13),
+	       autotools-dev,
+	       make,
+	       texinfo,
+	       gcc,
+	       gawk,
+	       libext2fs-dev,
+	       uuid-dev,
+	       ntfs-3g-dev,
+	       libaal-dev,
+	       libreiser4-dev,
+Standards-Version: 4.6.0
+Homepage: https://wipefreespace.sourceforge.io/
+Vcs-Browser: https://gitlab.com/kaisenlinux/packages/wipefreespace
+Vcs-Git: https://gitlab.com/kaisenlinux/packages/wipefreespace.git
+
+Package: wipefreespace
+Architecture: amd64
+Depends: ${shlibs:Depends},
+	 ${misc:Depends},
+	 libext2fs2,
+         uuid,
+         ntfs-3g,
+         reiser4progs,
+	 ocfs2-tools,
+	 jfsutils,
+	 xfsprogs,
+	 hfsplus,
+Description: WipeFreeSpace is a program which will securely wipe (clean, shred, fill, overwrite) the free space

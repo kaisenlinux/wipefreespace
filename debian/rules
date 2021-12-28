@@ -1,0 +1,9 @@
+#!/usr/bin/make -f
+
+export DEB_BUILD_OPTIONS=nocheck
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	dh_auto_configure -- --prefix=/usr --enable-EXT234 --enable-HFSP --enable-FAT --enable-JFS --enable-LIBHIDEIP --enable-LIBNETBLOCK --enable-MINIX --enable-nls --enable-NTFS --enable-OCFS --enable-part --enable-REISER4 --enable-REISERFS --enable-wfs --enable-XFS --enable-unrm

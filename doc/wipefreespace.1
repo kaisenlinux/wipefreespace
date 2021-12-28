@@ -1,0 +1,226 @@
+.\"	Process this file with groff -man -Tascii foo.1
+.\"
+.TH wipefreespace 1 Linux "User's Manual"
+
+.SH NAME
+wipefreespace \- Secure cleaning of free space on filesystems.
+
+.SH SYNOPSIS
+.B wipefreespace [options]
+.I /dev/XY
+.B ...
+
+.SH DESCRIPTION
+The wipefreespace program securely cleans the free space and undelete data
+on the given ext2/3/4, NTFS, XFS, ReiserFSv3/4, FAT12/16/32, MinixFSv1/2, JFS, HFS+ and OCFS file systems.
+Write permissions are required for the devices
+(or regular files containing the file system), but the program
+.B MUST NOT
+be setuid(root).
+
+Each given filesystem is wiped ONLY ONCE, no matter how many times it appears on the command line.
+WipeFreeSpace also works for file systems created inside regular files on any host file system.
+
+Wipefreespace wipes the following things (when supported by the backing library):
+.IP - 2
+free space (space in unused blocks/clusters)
+.IP - 2
+free space in partially used blocks (also called the "slack space")
+.IP - 2
+deleted files' names and other data that can be used to undelete a file (like the journal)
+
+.LP
+Wipefreespace does NOT decrease the amount of available free space when working.
+
+To perform a command after wiping (like sending e-mail), simply run a
+program after WipeFreeSpace is finished, for example:
+
+	wipefreespace [options] /dev/XY; mail [options]
+
+or in a script:
+
+	#!/bin/bash
+
+	wipefreespace [options] /dev/XY
+
+	mail [options]
+
+To run WipeFreeSpace with a higher or lower priority, simply use the "renice" utility, for example:
+
+	renice +1 $(pidof wipefreespace)
+
+
+.SH OPTIONS
+Any option affects all filesystems given on the command line, not just the ones following it.
+
+.IP "--all-zeros"
+Use only zeros for wiping.
+.IP "--background"
+Continue work in the background, if possible. This disables verose mode.
+.IP "-b|--superblock OFFSET"
+Superblock offset on the given filesystems
+.IP "-B|--blocksize SIZE"
+Block size on the given filesystems
+.IP -f|--force
+Wipe even if the file system has errors
+.IP -h|--help
+Print help
+.IP "--last-zero"
+Perform additional wiping with zeros
+.IP -l|--license
+Print license information
+.IP "-n|--iterations NNN"
+Number of passes (greater than 0)
+.IP "--method NAME"
+Use the given method for wiping (read below).
+.IP --nopart
+Do NOT wipe free space in partially used blocks.
+.IP --nounrm
+Do NOT wipe undelete information
+.IP --nowfs
+Do NOT wipe free space on file system
+.IP --no-wipe-zero-blocks
+Do NOT wipe all-zero blocks on file system (useful for virtual/sparse devices,
+where empty areas are read as all-zeros and do not take physical space unless
+actually written to).
+.IP --use-dedicated
+Use the program dedicated for the given filesystem type if supported. Fallback to
+WipeFreeSpace if unsupported (currently, only 'ntfswipe' is supported)
+.IP --use-ioctl
+Disable device caching during work (can be DANGEROUS)
+.IP -v|--verbose
+Verbose output. Use twice for more. This also enables progress bars, but be warned: these may
+not always be accurate or increase at a constant rate.
+.IP -V|--version
+Print version number
+
+.SH "WIPING METHODS"
+The following method names (case-insensitive) are available:
+.IP Gutmann 10
+- method similar to Gutmann's, the default, 36 passes
+.IP random 10
+- shred-like, 25 passes
+.IP schneier 10
+- Shneier's method, 7 passes, contains ITSG-06
+.IP dod 10
+- DoD, 3 passes, contains NAVSO P-5239-26 and German Federal Office for Information Security
+
+
+.SH DIAGNOSTICS
+The program returns with 0 exit code if everything went fine. If there
+were errors, the program exits with non-zero exit code:
+.IP 1:
+Only version number, help or licence information was requested and printed, no action.
+.IP \-1:
+Bad/missing command line syntax.
+.IP \-2:
+Unable to check if the file system is mounted. Cannot continue.
+.IP \-3:
+The file system was mounted in read-write mode. Cannot continue.
+.IP \-4:
+Unable to open the file system.
+.IP \-5:
+Unable to read block bitmap from the file system (thus, unable to determine, which
+blocks are unused).
+.IP \-6:
+Memory allocation failed.
+.IP \-7:
+The file system contained errors and the option \-\-force was not given.
+.IP \-8:
+Closing the file system failed.
+.IP \-9:
+Opening i\-node scan failed. Thus, the program was unable to wipe free space in
+partially used blocks.
+.IP \-10:
+Iterating over blocks failed. Thus, the program was unable to wipe free space in
+partially used blocks.
+.IP \-11:
+I\-node read failed. Some undelete data may not have been removed.
+.IP \-12:
+Directory iterating failed. Thus, the program was unable to remove some of (maybe all)
+undelete data.
+.IP \-13:
+The program found out that it has the suid permission bit set and the owner
+is root. Read the first chapter of the info documentation for an explanation and a solution.
+.IP \-14:
+Flushing the changes to the filesystem failed.
+.IP \-15:
+Block writing failed.
+.IP \-16:
+Failed to open an attribute (mostly on NTFS).
+.IP \-17:
+Failed runlist on NTFS.
+.IP \-18:
+Getting name failed.
+.IP \-19:
+Context error (NTFS).
+.IP \-20:
+Bad parameter was passed to one of the functions.
+.IP \-21:
+Pipe error (mostly XFS).
+.IP \-22:
+Fork error (XFS or ReiserFSv3).
+.IP \-23:
+Exec error (XFS).
+.IP \-24:
+Seek error (mostly ReiserFSv4).
+.IP \-25:
+Block reading failed.
+.IP \-26:
+I/O control command (ioctl) failed.
+.IP \-100:
+A signal was caught and the program was forced to exit.
+
+.SH NOTES
+Only the last error is returned. If the last file system was wiped successfully,
+but the previous weren't, the last error will be returned, but not the previous ones.
+
+It is best to use this program on un-mounted file systems, which makes sure
+the journal is committed and there aren't any concurrent modifications.
+
+.SH AUTHOR
+Bogdan 'bogdro' Drozdowski,
+
+bogdro (at) users . sourceforge . net
+
+bogdro-soft (at) gmx . com
+
+[EN] https://wipefreespace.sourceforge.io
+
+[EN] http://bogdro.evai.pl/soft/
+
+[EN] http://bogdro.evai.pl/soft4asm/
+
+[EN] http://bogdro.evai.pl/index-en.php
+
+[EN] http://bogdro.byethost18.com/soft/
+
+[EN] http://bogdro.byethost18.com/soft4asm/
+
+[EN] http://bogdro.byethost18.com/index-en.php
+
+.SH THANKS
+Theodore Ts'o, for the great ext2fs library and e2fsprogs.
+
+The linux-ntfs team for their research on NTFS and a great programming library.
+
+Colin Plumb, for the great 'shred' program, parts of which are used here.
+
+Patrick R. McDonald 'marlowe' (www.antagonism.org) - for bug reports, testing and promoting WipeFreeSpace.
+
+Mark Lord (mlord@pobox.com) for the great hdparm utility.
+
+knightray@gmail.com for The Tiny FAT FS library (on LGPL).
+
+Gregory Grosse - for bug reports and testing WipeFreeSpace.
+
+
+.SH "SEE ALSO"
+.BR shred (1),
+info libsecrm
+
+The 'info' documentation is more descriptive and is the main one. Type
+
+.B 	info wipefreespace
+
+to read it.
