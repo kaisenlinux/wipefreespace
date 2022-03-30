@@ -1,3 +1,9 @@
+wipefreespace (2.5-2kaisen) kaisen-packages; urgency=medium
+
+  * Add wipefreespace logo
+
+ -- Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>  Wed, 30 Mar 2022 02:53:34 +0100
+
 wipefreespace (2.5-1kaisen) kaisen-packages; urgency=medium
 
   * First packaging for Kaisen Linux
