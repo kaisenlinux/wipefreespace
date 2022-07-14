@@ -1,3 +1,9 @@
+wipefreespace (2.5-3kaisen) kaisen-packages; urgency=medium
+
+  * Add manpage
+
+ -- Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>  Thu, 14 Jul 2022 06:17:41 +0100
+
 wipefreespace (2.5-2kaisen) kaisen-packages; urgency=medium
 
   * Add wipefreespace logo
