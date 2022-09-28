@@ -1,7 +1,7 @@
 This is wipefreespace.info, produced by makeinfo version 6.7 from
 wipefreespace.texi.
 
-This manual is for WipeFreeSpace, version 2.5
+This manual is for WipeFreeSpace, version 2.6
 INFO-DIR-SECTION Individual utilities
 START-INFO-DIR-ENTRY
 * WipeFreeSpace: (wipefreespace).		Securely clean the free space.
@@ -13,7 +13,7 @@ File: wipefreespace.info,  Node: Top,  Next: What is WipeFreeSpace?,  Prev: (dir
 The WipeFreeSpace program
 *************************
 
-This manual is for WipeFreeSpace, version 2.5
+This manual is for WipeFreeSpace, version 2.6
 
 * Menu:
 
@@ -23,6 +23,7 @@ This manual is for WipeFreeSpace, version 2.5
 * Usage::				How to use this thing.
 * Return values::			Program's return values.
 * Signals::				Behaviour upon receiving signals.
+* Reporting issues::			How to report issues.
 * Author::				How to contact me.
 * Thanks::				Who I'd like to thank.
 * Copying::				License - your rights and freedoms.
@@ -38,13 +39,13 @@ This program is used for secure erasing of free space on ext2, ext3,
 ext4, NTFS, XFS, ReiserFSv3, ReiserFSv4, FAT12, FAT16, FAT32, MinixFSv1,
 MinixFSv2, JFS, HFS+ and OCFS partitions.
 
-   Wipefreespace wipes the following things (when supported by the
+   WipeFreeSpace wipes the following things (when supported by the
 backing library):
    * free space (space in unused blocks/clusters)
    * free space in partially used blocks (also called the "slack space")
    * deleted files' names and other data that can be used to undelete a
      file (like the journal)
-   Wipefreespace does *NOT* decrease the amount of available free space
+   WipeFreeSpace does *NOT* decrease the amount of available free space
 when working.
 
    Normally, when you delete a file, only the information about where
@@ -54,7 +55,7 @@ drive for a long time.  The file contents can be found by e.g.  dumping
 the whole drive with the 'dd' program to a file and looking at the
 generated image.  This may seem not so dangerous, but if you delete
 confidential information (files with passwords, credit card numbers,
-encryption keys), any person with phyical access to the drive can read
+encryption keys), any person with physical access to the drive can read
 that information and use it against you.
 
    *ALWAYS USE THE 'shred' (or similar) PROGRAM TO ERASE CONFIDENTIAL
@@ -62,13 +63,13 @@ DATA.*
 
    Sometimes you may delete confidential data the normal way by accident
 (or have no other choice, because programs like Internet browsers, mail
-clients, char clients delete data the normal way).  In such case
+clients, chat clients delete data the normal way).  In such case
 normally you would have to shred the whole partition, which may be a big
 problem.  This is where WipeFreeSpace comes in.  This program works in a
-similar way to the 'shred' program, but instead of shreding regular
+similar way to the 'shred' program, but instead of shredding regular
 files, it overwrites (just like 'shred') the free space on a partition,
-hopefully without doing any harm to existing files.  The wiped blocks
-are *NOT* marked as used at any stage.
+without doing any harm to existing files.  The wiped blocks are *NOT*
+marked as used at any stage.
 
    This program also tries to wipe the remaining space in blocks
 partially used by existing files and wipe deleted elements' names.
@@ -101,8 +102,9 @@ File: wipefreespace.info,  Node: How to compile?,  Next: Filesystems support,  P
 *****************************
 
 Requirements for compiling the full version of the program:
-   * a working C compiler.  NTFS support may require the 'gcc' compiler.
-     C++ compilers won't work due to variable casts.
+   * a working C compiler.  XFS, ReiserFS, Reiser4 and NTFS support
+     require the 'long long' data type.  NTFS support may require the
+     'gcc' compiler.  C++ compilers won't work due to variable casts.
    * development package for the C library (like glibc-devel and
      glibc-headers).
    * the 'make' program
@@ -126,9 +128,10 @@ respectively).  You cannot disable all of these.
 
    Run './configure --help' for details.
 
-   If you do NOT wish WipeFreeSpace to use the network or get the
-computer's IP address, get LibHideIP>=0.2 and LibNetBlock and configure
-WipeFreeSpace with
+   If you do *NOT* wish WipeFreeSpace to use the network or get the
+computer's IP address, get LibHideIP>=0.2
+(https://libhideip.sourceforge.io) and LibNetBlock
+(https://libnetblock.sourceforge.io) and configure WipeFreeSpace with
 
    './configure --enable-LIBHIDEIP --enable-LIBNETBLOCK'
 
@@ -138,9 +141,11 @@ WipeFreeSpace with
 
    'make'
 
-   to compile the program.  Documentation is compiled, but may be
-recompiled, if you have the 'makeinfo' program ('texinfo' package).
-Translations will be compiled, if you have the 'gettext' package.
+   to compile the program.
+
+   Documentation is compiled, but may be recompiled, if you have the
+'makeinfo' program ('texinfo' package).  Translations will be compiled,
+if you have the 'gettext' package.
 
    *NOTE*: if you have trouble compiling, send me:
   1. the compiler name and version (e.g.  'gcc version 10'),
@@ -162,13 +167,13 @@ Translations will be compiled, if you have the 'gettext' package.
 
    to install the program.
 
-   *NOTE*: 'make install' is NOT recommended.  Create and install an RPM
-package instead, if possible.
+   *NOTE*: 'make install' is *NOT* recommended.  Create and install an
+RPM package instead, if possible.
 
    To create an RPM package:
 
   1. copy the 'wipefreespace.spec' file to '$HOME/rpmbuild/SPECS'
-  2. copy the source package 'wipefreespace-2.5.tar.gz' to
+  2. copy the source package 'wipefreespace-2.6.tar.gz' to
      '$HOME/rpmbuild/SOURCES'
   3. type 'rpmbuild -bb $HOME/rpmbuild/SPECS/wipefreespace.spec'
   4. get the RPMs from '$HOME/rpmbuild/RPMS/your_cpu_arch'
@@ -176,7 +181,7 @@ package instead, if possible.
    To create an RPM package (the old way):
 
   1. copy the 'wipefreespace.spec' file to '/usr/src/redhat/SPECS'
-  2. copy the source package 'wipefreespace-2.5.tar.gz' to
+  2. copy the source package 'wipefreespace-2.6.tar.gz' to
      '/usr/src/redhat/SOURCES'
   3. type 'rpmbuild -bb /usr/src/redhat/SPECS/wipefreespace.spec'
   4. get the RPMs from '/usr/src/redhat/RPMS/your_cpu_arch'
@@ -253,9 +258,10 @@ filesystem's creators, written without any specifications.
      'ntfs3g-ntfsprogs'.
      If you don't have anything like this installed or available (check
      twice), then go to
-     <http://www.tuxera.com/community/ntfs-3g-download/> Then compile
-     and install that package.  You can also use 'libntfs' (usually
-     included in something like 'ntfsprogs-devel').
+     <http://www.tuxera.com/community/ntfs-3g-download/>
+
+     Then compile and install that package.  You can also use 'libntfs'
+     (usually included in something like 'ntfsprogs-devel').
 
    The shipped patches for ntfsprogs are optional.  Whether or not they
 will be included in the official release of ntfsprogs, WipeFreeSpace
@@ -284,11 +290,11 @@ haven't found any usable development library.
    * the 'unistd.h' header
    * the 'fcntl.h' header
    * the 'mntent.h' header
-   * the 'wait.h' header or 'sys/wait.h' (not required, acutally, but a
+   * the 'wait.h' header or 'sys/wait.h' (not required, actually, but a
      good thing to have)
-   * the 'sched.h' header (not required, acutally, but a good thing to
+   * the 'sched.h' header (not required, actually, but a good thing to
      have)
-   * the 'paths.h' header (not required, acutally, but a good thing to
+   * the 'paths.h' header (not required, actually, but a good thing to
      have)
    * the 'fork()' function
    * the 'execvp()' function
@@ -297,7 +303,7 @@ haven't found any usable development library.
    * the 'pipe()' function
    * the 'kill()' function
    * the 'waitpid()' or 'wait()' function
-   * the 'sleep()' function (not required, acutally, but a good thing to
+   * the 'sleep()' function (not required, actually, but a good thing to
      have)
    * the 'long long' data type support in the compiler
    * 'xfsprogs' installed and in your 'PATH' variable (devel package
@@ -507,7 +513,7 @@ creators, written without any specifications.
 
      After applying any patch, you need to recompile and install the
      library - 'libtffs.a' - and ALL its header - '*.h' - files
-     (including the private ones, from the src directory).
+     (including the private ones, from the 'src' directory).
 
    Operations:
    * wiping the free space
@@ -550,7 +556,7 @@ Support: using the 'mfstool' program unofficially as a library.
      Then copy the files 'libminixfs.a', 'minix_fs.h' and 'protos.h' to
      a directory where the C compiler can find them (or put the correct
      '-I' and '-L' options in the compiler flags).  You can use the
-     provided patches to do this instead of the sed command:
+     provided patches to do this instead of the 'sed' command:
 
      'patch -F10 -p1 <
      /path/to/wipefreespace-XX/patches/mfstool-0.5.diff'
@@ -691,33 +697,39 @@ File: wipefreespace.info,  Node: Usage,  Next: Return values,  Prev: Filesystems
 
 * Menu:
 
-* KDE::					Konqueror's/Dolphin's context menu.
+* KDE::					Context menu.
+* Xfce::				Context menu.
 * Command line syntax and options::	Running from the command line.
 
 
-File: wipefreespace.info,  Node: KDE,  Next: Command line syntax and options,  Prev: Usage,  Up: Usage
+File: wipefreespace.info,  Node: KDE,  Next: Xfce,  Prev: Usage,  Up: Usage
 
 4.1 KDE
 =======
 
-*KDE3*: Copy the 'wipefreespace.desktop' file from the distribution
-tarball to '$KDEHOME/share/apps/konqueror/servicemenus/', creating the
-directory if necessary.  '$KDEHOME' is usually '$HOME/.kde'.  Then,
-restart Konqueror.  A new context menu entry under the "Actions" submenu
-should be available for block devices and all files (a filesystem can
-reside inside a regular file).
+To use WipeFreeSpace in KDE, download and install FMSec
+(https://fmsec.sourceforge.io), a set of extensions to file managers
+that enable some security-related operations to be easily performed
+(formerly: KonqSec/Konq4Sec/Konq5Sec).
 
-   *KDE4*: Copy the 'wipefreespace-kde4.desktop' file from the
-distribution tarball to '$HOME/.kde4/share/kde4/services/ServiceMenus/',
-creating the directory if necessary.  Then, restart Konqueror/Dolphin.
-A new context menu entry under the "Actions" submenu should be available
-for block devices and all files (a filesystem can reside inside a
-regular file).
+   The *.desktop files previously bundled with WipeFreeSpace are
+considered deprecated.
 
 
-File: wipefreespace.info,  Node: Command line syntax and options,  Prev: KDE,  Up: Usage
+File: wipefreespace.info,  Node: Xfce,  Next: Command line syntax and options,  Prev: KDE,  Up: Usage
 
-4.2 Command line syntax and options
+4.2 Xfce
+========
+
+To use WipeFreeSpace in Xfce, download and install FMSec
+(https://fmsec.sourceforge.io), a set of extensions to file managers
+that enable some security-related operations to be easily performed
+(formerly: KonqSec/Konq4Sec/Konq5Sec).
+
+
+File: wipefreespace.info,  Node: Command line syntax and options,  Prev: Xfce,  Up: Usage
+
+4.3 Command line syntax and options
 ===================================
 
 Basic syntax is:
@@ -727,7 +739,7 @@ Basic syntax is:
    The '/dev/XY' part stands for a device with a supported file system.
 Examples: '/dev/hda1', '/dev/fd0'.  More than one device can be given on
 the command line, but they will be wiped sequentially, *NOT* in multiple
-threads.  WipeFreeSpace is not multi-threaded and probably won't be,
+threads.  WipeFreeSpace is not multithreaded and probably won't be,
 because the libraries used can be not thread-safe and the program can't
 tell if a library will be used until it's used.
 
@@ -812,7 +824,7 @@ error.  There is no guarantee that it will be fully wiped.
 
 '--use-ioctl'
      Disable device caching during work (can be *DANGEROUS*). This
-     requires the fcntl.h header file and the ioctl() function to be
+     requires the 'fcntl.h' header file and the 'ioctl()' function to be
      present.  *NOTE*: this may not work for sub-partitions on drives.
      To disable the cache, run the 'hdparm' utility with the correct
      options to disable the cache before running 'wipefreespace' and
@@ -876,7 +888,7 @@ File: wipefreespace.info,  Node: Return values,  Next: Signals,  Prev: Usage,  U
 
 The WipeFreeSpace program can return any of the following values:
 
-   * 0: All actions on the last file system succeded (no errors).
+   * 0: All actions on the last file system succeeded (no errors).
    * 1: Only version number, help or licence information was requested
      and printed, no action.
    * -1: Bad/missing command line syntax.
@@ -919,7 +931,7 @@ The WipeFreeSpace program can return any of the following values:
    * 128+N: The program was terminated by signal number N (the signal
      either wasn't caught or was caught after SIGCONT was received).
 
-   *NOTE*: Actually, the negative values are substracted from 256, so -1
+   *NOTE*: Actually, the negative values are subtracted from 256, so -1
 could turn up as 255, -2 as 254 and so on.
 
    *NOTE*: Only the last error is returned.  If the last file system was
@@ -927,7 +939,7 @@ wiped successfully, but the previous weren't, the last error will be
 returned, but not the previous ones.
 
 
-File: wipefreespace.info,  Node: Signals,  Next: Author,  Prev: Return values,  Up: Top
+File: wipefreespace.info,  Node: Signals,  Next: Reporting issues,  Prev: Return values,  Up: Top
 
 6 Signals
 *********
@@ -949,7 +961,7 @@ exits the main program.
    If the program receives the SIGKILL signal, it will, of course, be
 killed.  But it won't be able to close the file system and finish
 working normally.  The file system being worked on could be left in an
-unconsistent state, errors could show up.  Try to avoid stopping the
+inconsistent state, errors could show up.  Try to avoid stopping the
 program this way.
 
    You can freeze the program by sending the SIGSTOP signal (like
@@ -963,9 +975,46 @@ terminate it.
 working 'volatile' data type.  If you are using GCC, no worries.
 
 
-File: wipefreespace.info,  Node: Author,  Next: Thanks,  Prev: Signals,  Up: Top
+File: wipefreespace.info,  Node: Reporting issues,  Next: Author,  Prev: Signals,  Up: Top
 
-7 Author
+7 Reporting issues
+******************
+
+To report build or installation problems, include:
+  1. the compiler name and version (e.g.  'gcc' version 10),
+  2. the C standard library name and version (e.g.  'glibc' version
+     2.x),
+  3. the output of the 'configure' script.  You can capture it by
+     running './configure > configure-output.txt 2>&1',
+  4. the generated 'config.log' file,
+  5. the generated 'config.h' file, if it exists,
+  6. the output of the 'make' command.  You can capture it by running
+     'make > make-output.txt 2>&1',
+  7. any other error messages,
+  8. any other information that you think could lead to solving the
+     problem.
+
+   To report usage problems, include:
+  1. all the above things you include when reporting building problems,
+  2. a description of the problem that the software causes,
+  3. any error messages that are displayed,
+  4. information whether you tried other wiping methods and whether they
+     work,
+  5. information whether you tried wiping just parts (undelete data,
+     free space, partial blocks) of the filesystem and whether it
+     worked,
+  6. information whether you tried another filesystems, if possible, and
+     whether it worked,
+  7. (if the problem is with a filesystem) if possible, the whole input
+     filesystem or a minimalistic input file that causes the problem to
+     show (e.g.  file of zero length or with a strange name),
+  8. any other information that you think could lead to solving the
+     problem.
+
+
+File: wipefreespace.info,  Node: Author,  Next: Thanks,  Prev: Reporting issues,  Up: Top
+
+8 Author
 ********
 
 Bogdan 'bogdro' Drozdowski.
@@ -975,18 +1024,12 @@ Bogdan 'bogdro' Drozdowski.
      bogdro-soft (at) gmx .  com
 
    or look at my website:
-[EN] <https://wipefreespace.sourceforge.io>
-[EN] <http://bogdro.evai.pl/soft/>
-[EN] <http://bogdro.evai.pl/soft4asm/>
-[EN] <http://bogdro.evai.pl/index-en.php>
-[EN] <http://bogdro.byethost18.com/soft/>
-[EN] <http://bogdro.byethost18.com/soft4asm/>
-[EN] <http://bogdro.byethost18.com/index-en.php>
+<https://wipefreespace.sourceforge.io>
 
 
 File: wipefreespace.info,  Node: Thanks,  Next: Copying,  Prev: Author,  Up: Top
 
-8 Thanks
+9 Thanks
 ********
 
   1. Theodore Ts'o, for the great ext2fs library and e2fsprogs.
@@ -998,15 +1041,19 @@ File: wipefreespace.info,  Node: Thanks,  Next: Copying,  Prev: Author,  Up: Top
      Copyright (C) 1997, 1998, 1999 Colin Plumb.
   4. Patrick R. McDonald 'marlowe' (www.antagonism.org) - for bug
      reports, testing and promoting WipeFreeSpace.
-  5. Mark Lord (mlord@pobox.com) for the great hdparm utility.
-  6. knightray@gmail.com for The Tiny FAT FS library (on LGPL).
+  5. Mark Lord (mlord /at/ pobox.com) for the great hdparm utility.
+  6. knightray /at/ gmail.com for The Tiny FAT FS library (on LGPL).
   7. Gregory Grosse - for bug reports and testing WipeFreeSpace.
+  8. Travis CI (https://www.travis-ci.com/) for providing build
+     environments.
+  9. GitHub (https://github.com/) for providing code versioning,
+     security tests, build environments and integration with Travis CI.
 
 
 File: wipefreespace.info,  Node: Copying,  Next: Translating,  Prev: Thanks,  Up: Top
 
-9 Copying
-*********
+10 Copying
+**********
 
 WipeFreeSpace is licensed under the GNU GPL v2+.  This documentation is
 licensed under the GNU FDL v1.2.
@@ -1019,8 +1066,8 @@ licensed under the GNU FDL v1.2.
 
 File: wipefreespace.info,  Node: GNU General Public License version 2,  Next: GNU Free Documentation License version 1.2,  Prev: Copying,  Up: Copying
 
-9.1 GNU General Public License
-==============================
+10.1 GNU General Public License
+===============================
 
                          Version 2, June 1991
 
@@ -1380,8 +1427,8 @@ GNU Lesser General Public License instead of this License.
 
 File: wipefreespace.info,  Node: GNU Free Documentation License version 1.2,  Prev: GNU General Public License version 2,  Up: Copying
 
-9.2 GNU Free Documentation License
-==================================
+10.2 GNU Free Documentation License
+===================================
 
                       Version 1.2, November 2002
 
@@ -1809,7 +1856,7 @@ their use in free software.
 
 File: wipefreespace.info,  Node: Translating,  Prev: Copying,  Up: Top
 
-10 Translating
+11 Translating
 **************
 
 Type 'msginit -i wipefreespace.pot -o XX.po', substituting your 2-letter
@@ -1819,15 +1866,15 @@ to 'XX.po' and manually add the following header, if you wish.
 In the resulting 'XX.po' file you have to fill in all the fields marked
 with capital letters in the header:
 
-   ' # YOUR LANGUAGE translations for wipefreespace package.
-# Copyright (C) 2007-2021 Bogdan 'bogdro' Drozdowski
+# YOUR LANGUAGE translations for WipeFreeSpace package.
+# Copyright (C) 2007-2022 Bogdan 'bogdro' Drozdowski
 # This file is distributed under the same license as
-# the wipefreespace package.
+# the WipeFreeSpace package.
 # YOUR FULL NAME <EMAILADDRESS>, YEAR.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: wipefreespace 2.5\n"
+"Project-Id-Version: WipeFreeSpace 2.6\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-08-03 15:28+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
@@ -1836,7 +1883,6 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
-'
 
    The rest of the file will contain messages from the program.
 Translate them all and send me the resulting 'XX.po' file.
@@ -1850,30 +1896,32 @@ Translate them all and send me the resulting 'XX.po' file.
 
 Tag Table:
 Node: Top278
-Node: What is WipeFreeSpace?948
-Node: How to compile?4238
-Node: Filesystems support7340
-Node: Ext2/3/48111
-Node: NTFS9071
-Node: XFS10310
-Node: ReiserFSv312091
-Node: ReiserFSv415915
-Node: FAT12/16/3218165
-Node: MinixFS20418
-Node: JFS22458
-Node: HFS+24225
-Node: OCFS25093
-Node: Usage25937
-Node: KDE26181
-Node: Command line syntax and options27048
-Node: Return values31898
-Node: Signals34436
-Node: Author36047
-Node: Thanks36646
-Node: Copying37431
-Node: GNU General Public License version 237763
-Node: GNU Free Documentation License version 1.257080
-Node: Translating79511
+Node: What is WipeFreeSpace?993
+Node: How to compile?4275
+Node: Filesystems support7539
+Node: Ext2/3/48310
+Node: NTFS9270
+Node: XFS10510
+Node: ReiserFSv312291
+Node: ReiserFSv416115
+Node: FAT12/16/3218365
+Node: MinixFS20620
+Node: JFS22662
+Node: HFS+24429
+Node: OCFS25297
+Node: Usage26141
+Node: KDE26389
+Node: Xfce26807
+Node: Command line syntax and options27165
+Node: Return values32019
+Node: Signals34557
+Node: Reporting issues36178
+Node: Author37764
+Node: Thanks38114
+Node: Copying39129
+Node: GNU General Public License version 239463
+Node: GNU Free Documentation License version 1.258782
+Node: Translating81215
 
 End Tag Table
 

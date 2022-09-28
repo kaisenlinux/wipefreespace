@@ -1,3 +1,9 @@
+wipefreespace (2.6-1kaisen) kaisen-packages; urgency=medium
+
+  * Import the 2.6 version
+
+ -- Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>  Sun, 25 Sep 2022 22:09:18 +0100
+
 wipefreespace (2.5-3kaisen) kaisen-packages; urgency=medium
 
   * Add manpage
